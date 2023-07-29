@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load humanize %}
+
+
+{% block title %}Dashboard{% endblock title %}
+{% block active0 %}active{% endblock %}
+{% block active00 %}active{% endblock %}
+{% block active000 %}active{% endblock %}
+{% block style %}
+<style>
+    * {
+        box-sizing: border-box;
+    }
+    /* Dashboard */
+.dash-con {
+    background: #fff;
+    height: fit-content;
+    margin: 20px 0px;
+}
+.dash-head {
+    font-size: 25px;
+    font-weight: 700;
+}
+.count {
+    padding: 5px 8px;
+    background: #000;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 12px;
+}
+.dash-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+.dash-item img {
+    padding: 5px;
+    border: 1px solid gray;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    margin-top: 10px;
+}
+.dash-des {
+    padding-left: 20px;
+}
+.dash-des h3 {
+    font-weight: 600;
+    font-size: 25px;
+}
+button.btn {margin-bottom: 5px;}
+@media only screen and (max-width: 768px) {
+    .dash-item img {
+        width: 70px !important;
+        height: 70px !important;
+    }
+    .dash-des h3 {
+        font-size: 20px !important;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Groups -->
+    <div class="dash-con dash-group row col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+        <div class="dash-head col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            My Groups <sup><span class="count">{{ groups.count }}</span></sup>
+            <a href="{% url 'group_list' %}" style="margin-top:15px;">
+                <button type="button" class="btn btn-primary">
+                    <i class="fa fa-group"></i> All Groups
+                </button>
+            </a>
+        </div>
+        {% for g in groups %}
+            <div class="dash-item col-12 col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                <img src="{{ g.image.url }}" alt="" />
+                <div class="dash-des">
+                    <h3>{{ g.title }}</h3>
+                    <span style="font-size:15px;">{{ g.description }}</span>
+                    <div style="color:gray;font-size:15px;">
+                        <i class="fa fa-globe"></i> {{ g.type }}&nbsp;&nbsp;&nbsp;
+                        <i class="fa fa-group"></i> {{ g.members.count|intcomma }} member{{ g.members.count|pluralize }}&nbsp;&nbsp;&nbsp;
+                        <i class="fa fa-book"></i> {{ g.quizzes.count|intcomma }} quiz&nbsp;&nbsp;&nbsp;
+                        <i class="fa fa-user"></i> {% if request.user in g.admins.all %}Admin{% else %}Member{% endif %}
+                    </div> 
+                </div>
+                <div style="margin-top:10px;width:100%;">
+                    <a href="{{ g.get_group_detail }}" title="View Group"><button class="btn btn-info"><i class="fa fa-eye"></i></button></a>
+                    <a href="#" title="Group Quiz" class="group-quiz" data-id="{{ g.slug }}" data-toggle="modal" data-target="#groupQuizModal">
+                        <button class="btn btn-primary"><i class="fa fa-book"></i> <i class="fa fa-question"></i></button>
+                    </a>
+                    {% if request.user in g.admins.all %}
+                        <button class="btn btn-success add-quiz-group" title="Add Quiz" data-toggle="modal" data-target="#addGroupQuizModal" data-id="{{ g.title }}">
+                            <i class="fa fa-book"></i> <i class="fa fa-plus"></i>
+                        </button>
+                    {% endif %}
+                    <a href="#" class="join" data-id="{{ g.slug }}" data-action="{% if request.user in g.members.all %}leave{% else %}join{% endif %}">
+                        {% if request.user in g.members.all %}
+                            <button class="btn btn-danger join-btn" title="Leave Group">
+                                <i class="fa fa-user-times"></i>
+                            </button>
+                        {% else %}
+                        <button class="btn btn-success join-btn" title="Join Group">
+                            <i class="fa fa-user-plus"></i>
+                        </button>
+                        {% endif %}
+                    </a>
+                    
+                </div>
+            </div>
+        {% empty %}
+        <h4 style="color:gray;">You don't have any group.</h4>
+        {% endfor %}
+        
+    </div>
+    <!-- User Created Quiz -->
+    <div class="dash-con dash-quiz-con row col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+        <div class="dash-head col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            My Quiz <sup><span class="count">{{ quiz.count }}</span></sup>
+            <a href="{% url 'quiz_list' %}" style="margin-top:15px;">
+                <button type="button" class="btn btn-primary">
+                    <i class="fa fa-book"></i> All Quiz
+                </button>
+            </a>
+        </div>   
+        {% for q in quiz %}
+            <div class="dash-item dash-quiz col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                <div class="dash-des">
+                    <h3>{{ q.title }}</h3>
+                    <div style="color:gray;font-size:15px;">
+                        <i class="fa fa-clock-o"></i> {{ q.duration }} mins&nbsp;&nbsp;&nbsp;
+                        <i class="fa fa-question"></i> {{ q.questions.count }} question{{ q.questions.count|pluralize }}&nbsp;&nbsp;&nbsp;
+                        <i class="fa fa-group"></i> {{ q.score.count }} participant{{ q.score.count|pluralize }}
+                        
+                    </div>
+                    <div>
+                        <a href="{{ q.get_group_detail }}" title="View Quiz"><button class="btn btn-primary"><i class="fa fa-eye"></i></button></a>
+                        <button class="btn btn-info ranking" title="Quiz Rankings" data-toggle="modal" data-target="#quizRankModal" data-id="{{ q.slug }}"><i class="fa fa-bar-chart"></i></button>
+                        <button class="btn btn-success add-que-btn" title="Add Questions" data-toggle="modal" data-target="#addQuestionModal" data-id="{{ q.title }}"><i class="fa fa-question"></i> <i class="fa fa-plus"></i></button>
+                        <a href="#" title="Delete Quiz" class="delete-quiz" data-id="{{ q.slug }}"><button class="btn btn-danger"><i class="fa fa-trash"></i></button></a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+        <h4 style="color:gray;">You don't have any quiz.<br></h4>
+        {% endfor %}
+        
+    </div>
+</div>
+
+
+{% endblock %}

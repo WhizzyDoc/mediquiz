@@ -1,0 +1,569 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load humanize %}
+
+
+{% block title %}People{% endblock title %}
+{% block active8 %}active{% endblock %}
+{% block active88 %}active{% endblock %}
+{% block active888 %}active{% endblock %}
+{% block style %}
+
+
+<style>
+    /* Dashboard */
+    * {
+        box-sizing: border-box;
+    }
+    /* Dashboard */
+.dash-con {
+    padding: 20px;
+    background: #fff;
+    height: fit-content;
+    margin: 20px 0px;
+}
+.dash-head {
+    font-size: 25px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.dash-head input {
+    padding: 10px;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    box-shadow: 0 9px 18px rgba(0, 0, 0, 0.3), 0px 7px 5px rgba(0, 0, 0, 0.22);
+    border-radius: 25px;
+    width: 180px;
+    font-weight: 400;
+    transition: width .3s ease-in-out;
+}
+
+.dash-head input:focus {
+    width: 280px;
+}
+.dash-head input::placeholder {
+    color: gray;
+}
+.count {
+    padding: 5px 8px;
+    background: #000;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 12px;
+}
+.dash-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+.dash-item img {
+    padding: 5px;
+    border: 1px solid gray;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    margin-top: 10px;
+}
+.dash-des {
+    padding-left: 20px;
+}
+.dash-des h3 {
+    font-weight: 600;
+    font-size: 30px;
+}
+button.btn {margin-bottom: 5px;}
+@media only screen and (max-width: 768px) {
+    .dash-item img {
+        width: 70px !important;
+        height: 70px !important;
+    }
+    .dash-des h3 {
+        font-size: 20px !important;
+    }
+}
+::selection{
+  background: rgba(23,162,184,0.3);
+}
+.wrapper{
+  padding: 0;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.wrapper .tabs{
+  position: relative;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+.wrapper .tabs label{
+  display: block;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  line-height: 50px;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  color: #17a2b8;
+  font-size: 20px;
+  font-weight: 500;
+  border-radius: 5px;
+  margin: 0 5px;
+  transition: all 0.3s ease;
+}
+.wrapper .tabs label:hover{
+  background: rgba(23,162,184,0.3);
+}
+#pro:checked ~ .tabs label.pro,
+#group:checked ~ .tabs label.group,
+#quiz:checked ~ .tabs label.quiz,
+#score:checked ~ .tabs label.score,
+  #about:checked ~ .tabs label.about{
+  color: #fff;
+}
+.tabs label i{
+  padding-right: 7px;
+}
+@media screen and (max-width:350px) {
+    .tabs label span {display:none;}
+}
+.tabs .slider{
+  position: absolute;
+  height: 100%;
+  width: 25%;
+  left: 0;
+  bottom: 0;
+  z-index: 0;
+  border-radius: 5px;
+  background: #17a2b8;
+  transition: all 0.3s ease;
+}
+input[type="radio"]{
+  display: none;
+}
+#group:checked ~ .tabs .slider{
+  left: 25%;
+}
+#quiz:checked ~ .tabs .slider{
+  left: 50%;
+}
+#score:checked ~ .tabs .slider{
+  left: 75%;
+}
+
+section .content{
+  display: none;
+  background: #fff;
+}
+#pro:checked ~ section .content-1,
+#group:checked ~ section .content-2,
+#quiz:checked ~ section .content-3,
+#score:checked ~ section .content-4,
+#about:checked ~ section .content-5{
+  display: block;
+}
+section .content .title{
+  font-size: 21px;
+  font-weight: 500;
+  margin: 30px 0 10px 0;
+}
+section .content p{
+text-align: justify;
+}
+#chatBody {
+    height: 500px;
+    overflow-y: auto;
+}
+.chat-con{
+    width: 100%;
+    padding: 5px;
+    height: fit-content;
+}
+.chat-div {
+    width: 100%;
+    
+}
+#emoji-btn {
+    font-size: 30px;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+#emoji-btn:hover {color:red}
+.chat-content {
+    min-width: 200px;
+    max-width: 80%;
+    padding: 5px;
+    border-radius: 10px;
+    background: rgb(169, 231, 247);
+    float: left;
+    clear: both;
+    margin-bottom: 10px;
+}
+.chat-content.user {
+    background: rgb(168, 245, 123);
+    float: right;
+    clear: both;
+}
+.chat-user {
+    font-size: 20px;
+    font-weight: 600;
+    color: red;
+    margin: 5px;
+}
+.chat-message {
+    font-size: 15px;
+    color: #000;
+    margin-bottom: 5px;
+    padding: 5px;
+}
+.chat-date {
+    font-size: 10px;
+    color: gray;
+    text-align: right;
+    margin-bottom: 0px;
+}
+#contact-id {
+    width: 30px;
+    height: 30px;
+    padding: 3px;
+    border: 1px solid gray;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+.dd-content {
+    position: absolute;
+    bottom: 100px;
+    left: 30px;
+    z-index: 1000;
+    width: 280px;
+    display: none;
+}
+.dd-content.show {
+    display: block;
+    animation: enter .2s linear;
+    -webkit-animation: enter .2s linear ease-in-out;
+}
+@keyframes enter {
+    from{
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+@-webkit-keyframes enter {
+    from{
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+@media screen and (max-width: 400px) {
+    #chatModal > div {
+        width:100% !important;
+    }
+}
+.tab-content {
+    height: 150px;
+    overflow-y: auto;
+    background: #ddd;
+}
+.dd-content span:hover {
+    background: #fff;
+}
+a.nav-link {
+    padding: 5px;
+    text-align: center;
+    font-size: 22px;
+}
+a.nav-link.active {
+    border-bottom: 2px solid blue;
+}
+.dd-emoji {
+    background: #ddd;
+}
+.content-emoji {
+    background: #ddd;
+}
+.emoji {
+    font-size: 30px;
+    cursor: pointer;
+    outline: none;
+    border: none;
+}
+.emoji:hover {
+    background: #fff;
+}
+.search-user-form {
+    position: relative;
+    display: inline-block;
+}
+.search-options {
+    position: absolute;
+    margin-top: 5px;
+    z-index: 50;
+    background: #fff;
+    display: none;
+    width: 100%;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.3), 0 14px 11px rgba(0, 0, 0, 0.22); 
+}
+.search-options a {
+    display: block;
+    padding: 15px;
+    text-decoration: none;
+    color: #000;
+    font-size: 15px;
+}
+.search-options a:hover {
+    color: #fff;
+    background: #000;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Groups -->
+    <div class="dash-con row col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+        
+        <div class="dash-head col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            <div>Active Users <sup><span class="count">{{ users.count }}</span></sup></div>
+            <form class="search-user-form" method="GET" action="#">
+                <input type="text" id="search-user" name="search-user" placeholder="Search by Username" required />
+                <div class="search-options">
+                    
+                </div>
+                
+            </form>
+        </div>
+
+        {% for u in users %}
+            <div class="dash-item col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+                {% if u.photo %}
+                <img src="{{ u.photo.url }}" alt="" />
+                {% else %}
+                <img src="{% static 'image/avatar.png' %}" alt="" />
+                {% endif %}
+                <div class="dash-des">
+                    <h3>{{ u.user.username }}</h3>
+                    <span style="font-size:15px;">{{ u.about|linebreaks }}</span>
+                    <div style="color:gray;font-size:15px;margin-top:0px;">
+                        <i class="fa fa-university"></i> {{ u.school }}&nbsp;&nbsp;&nbsp;
+                        <i class="fa fa-book"></i> {{ u.course }}
+                    </div>
+                    
+                </div>
+                <div style="width:100%;margin-top:5px;">
+                    <!--
+                    <a href="{{ u.get_user_profile }}"><button class="btn btn-primary"><i class="fa fa-eye"></i> View Profile</button></a>
+                    -->
+                    <button class="btn btn-primary view-profile-btn" data-toggle="modal" data-id="{{ u.user.username }}" data-target="#viewProfileModal">
+                        <i class="fa fa-eye"></i> View Profile
+                    </button>
+                    
+                    <button class="btn btn-success chat-btn" data-toggle="modal" data-id="{{ u.user.username }}" data-target="#chatModal">
+                        <i class="fa fa-comments"></i> Chat
+                    </button>
+                    
+                </div>
+            </div>
+        {% empty %}
+        <h4 style="color:gray;">No active users.</h4>
+        {% endfor %}
+        
+    </div>
+    
+</div>
+
+<!-- Chat -->
+        <!-- The Modal -->
+        <div class="modal fade" id="chatModal">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <form class="modal-content needs-validation" action="#" method="POST" id="send-chat-form">
+                    <div class="dd-content">
+                        <div class="content-emoji">
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs">
+                              <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#face">&#128512;</a>
+                              </li>
+                              <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#animal">&#128053;</a>
+                                              </li>
+                                              <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#food">&#127815;</a>
+                                              </li>
+                                              <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#heart">&#10084;</a>
+                                              </li>
+                                              <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#dress">&#128084;</a>
+                                              </li>
+                                              <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#hand">&#9757;</a>
+                                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#place">&#127963;</a>
+                              </li>
+                            </ul>
+                
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                              <div class="tab-pane active container dd-emoji" id="face"></div>
+                              <div class="tab-pane container dd-emoji" id="animal"></div>
+                              <div class="tab-pane container dd-emoji" id="food"></div>
+                              <div class="tab-pane container dd-emoji" id="heart"></div>
+                              <div class="tab-pane container dd-emoji" id="dress"></div>
+                              <div class="tab-pane container dd-emoji" id="hand"></div>
+                              <div class="tab-pane container dd-emoji" id="place"></div>
+                            </div>
+                          </div>
+                    </div>
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="chatTitle">Chat</h4>
+                        <button type="button" class="close close-chat" data-dismiss="modal">&times;</button>
+                    </div>
+            
+                    <!-- Modal body -->
+                    <div class="modal-body" id="chatBody">
+                        <div class="chat-con"></div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <textarea class="form-control" rows="2" id="message" name="message" placeholder="Your Message..." style="resize: none;" required></textarea>
+                        <button id="emoji-btn"><i class="fa fa-smile-o"></i></button>
+                        <button type="submit" class="btn btn-success" id="send-chat-submit"><i class="fa fa-send"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+
+
+{% endblock %}
+
+{% block script %}
+<script>
+$(document).on('input', '#search-user', function(e) {
+    var searchItem = $('#search-user').val();
+    if(searchItem != '') {
+        $('.search-options').show();
+    }
+    else {
+        $('.search-options').hide();
+    }
+    var loader = `<div class="loader"></div>`;
+    $('.search-options').html(loader);
+    
+    const search_user_url = "/activities/search/" + searchItem + "/";
+    fetch(search_user_url, {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest', // necessary to work with .is_ajax verification
+        },
+    })
+    .then(response => {
+        return response.json() // convert response to json
+    })
+    .then(data => {
+        users = data.users
+        $('.search-options').empty();
+        for (var key in users) {
+            var list = `<a href="#" data-target="#viewProfileModal" data-toggle="modal" class="search-result" id="${users[key].username}">${users[key].username}</a>`;
+            $('.search-options').append(list);
+        }
+        $('.search-result').click(function(e) {
+            e.preventDefault();
+            var username = $(this).attr('id');
+            //alert(username);
+            viewProfile(username);
+    })
+    })
+    
+})
+
+    function show_messages(chat_url) {
+        
+        fetch(chat_url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest', // necessary to work with .is_ajax verification
+                },
+        })
+        .then(response => {
+                return response.json() // convert response to json
+        })
+        .then(data => {
+                // perform action with response data
+                chats = data.chats;
+                var name = '{{ request.user.username }}';
+                var cl = '';
+                var me;
+                //alert(name);
+                $(".chat-con").empty();
+                for (var key in chats) {
+                    var date = new Date(chats[key].date).toLocaleDateString('en-GB');
+                    var hh = new Date(chats[key].date).getHours();
+                    var mm = new Date(chats[key].date).getMinutes();
+                    var zone = '';
+                    if(hh > 12) {
+                        hh = hh - 12;
+                        zone = "PM";
+                    }
+                    else if(hh == 12) {
+                        hh = 12;
+                        zone = "PM";
+                    }
+                    else {
+                        zone = "AM";
+                    }
+                    hh = hh < 10 ? '0' + hh : hh;
+                    mm = mm < 10 ? '0' + mm : mm;
+                    var time = `${hh}:${mm} ${zone}`;
+                    if(data.photo) {
+                        $('#contact-id').attr("src", data.photo);
+                    }
+                    if(chats[key].sender == name) {
+                        cl = 'user';
+                    }
+                    else{
+                        cl = '';
+                    }
+                    var temp = `
+                                    <div class="chat-div">
+                                        <div class="chat-content ${cl}">
+                                            <p class="chat-message">${chats[key].message}</p>
+                                            <p class="chat-date">${time}</p>
+                                        </div>
+                                        
+                                    </div>`;
+                    
+                    
+                    $(".chat-con").append(temp);
+                }
+            last_chat();    
+                
+        })
+        .catch(error => {
+                console.log("Error: " + error);
+                $(function() {
+                    Swal.fire('Error while getting messages!');
+                })
+        })
+    }
+
+</script>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load humanize %}
+
+
+{% block title %}Notifications{% endblock title %}
+{% block active4 %}active{% endblock %}
+{% block active44 %}active{% endblock %}
+{% block active444 %}active{% endblock %}
+{% block style %}
+<style>
+ .not-con {
+    padding: 10px;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    border-bottom: 1px solid gray;
+ }
+ .not-con img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    padding: 5px;
+    border: 1px solid gray;
+    margin: 0 5px;
+ }
+ .note {
+    margin-left: 15px;
+ }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row" style="padding: 20px;">
+    <!-- Activities -->
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+        <i class="fa fa-bell"></i>&nbsp;&nbsp;Your Recent Activities
+    </div>
+    {% for a in activity %}
+        {% with user=a.user %}
+            <div class="not-con col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+
+                {% if user.photo %}
+                    <a href="{{ user.get_user_profile }}">
+                        <img src="{{ user.photo.url }}" alt="" />
+                    </a>
+                {% else %}
+                    <img src="{% static 'image/avatar.png' %}" alt="" />
+                {% endif %}
+
+                {% if a.target %}
+                    {% with target=a.target %}
+                        {% if target.image %}
+                            <a href="{{ target.image.url }}">
+                                <img src="{{ target.image.url }}" alt="" />
+                            </a>
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+
+                <div class="note">
+                    <a href="{{ user.get_user_profile }}"><span style="font-weight:700;">You</span></a>
+                     {{ a.verb }} 
+                    {% if a.target %}
+                        {% with target=a.target %}
+                            <a href="{{ target.get_group_detail }}" style="font-weight:700;">{{ target }}</a>
+                        {% endwith %}
+                    {% endif %}&nbsp;&nbsp;&nbsp;
+                    <span style="color:grey"><i>{{ a.created|timesince }} ago</i></span>
+                </div>
+            </div>
+        {% endwith %}
+    {% endfor %}
+
+    <!-- Notifications -->
+
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12" style="margin-top:25px;">
+        <i class="fa fa-bell"></i>&nbsp;&nbsp;Recent Notifications
+    </div>
+    {% for action in actions %}
+        {% with user=action.user %}
+            <div class="not-con col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+
+                {% if user.photo %}
+                    <a href="{{ user.get_user_profile }}">
+                        <img src="{{ user.photo.url }}" alt="" />
+                    </a>
+                {% else %}
+                    <img src="{% static 'image/avatar.png' %}" alt="" />
+                {% endif %}
+
+                {% if action.target %}
+                    {% with target=action.target %}
+                        {% if target.image %}
+                            <a href="{{ target.image.url }}">
+                                <img src="{{ target.image.url }}" alt="" />
+                            </a>
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+
+                <div class="note">
+                    <a href="{{ user.get_user_profile }}"><span style="font-weight:700;">{{ user.user.username }}</span></a>
+                     {{ action.verb }} 
+                    {% if action.target %}
+                        {% with target=action.target %}
+                            <a href="{{ target.get_group_detail }}" style="font-weight:700;">{{ target }}</a>
+                        {% endwith %}
+                    {% endif %}&nbsp;&nbsp;&nbsp;
+                    <span style="color:grey"><i>{{ action.created|timesince }} ago</i></span>
+                </div>
+            </div>
+        {% endwith %}
+    {% endfor %}
+
+
+</div>
+{% endblock %}
+

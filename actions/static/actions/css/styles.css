@@ -1,0 +1,96 @@
+
+.login_form {
+  padding: 30px 20px 40px 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  background: #ddd;
+  margin-top: 50px;
+  border: none;
+  -webkit-box-shadow: 0 1px 3px 0.06px rgba(4, 26, 55, 0.16);
+  box-shadow: 0 1px 3px 0.06px rgba(4, 26, 55, 0.16);
+}
+
+.login_form div {
+  position: relative;
+  width: 100%;
+  height: 60px;
+  background: white;
+  border-radius: 8px;
+  margin-top: 15px;
+  padding: 0;
+  border:0;
+  overflow: hidden;
+  display: flex;
+  wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+.login_form a {
+  color: red;
+  text-decoration: none;
+}
+.login_form div label {
+    margin-top: 15px;
+    padding-left: 10px;
+}
+.login_form div input {
+  width: 70%;
+  height: 100%;
+  outline: none;
+  font-size: 20px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px 0 0 8px;
+}
+
+#google, #facebook, #twitter, .login_form button[type="submit"] {
+  outline: none;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 15px;
+  color:white;
+  cursor: pointer;
+}
+.login_form button[type="submit"] {
+    width: 100%;
+}
+button#google, button#facebook, #twitter {
+    width: 45%;
+}
+#google:hover, #facebook:hover, #twitter:hover,
+.login_form button[type="submit"]:hover {
+  opacity: 0.7;
+}
+#google, #facebook, #twitter {
+  font-size: 0.6rem;
+  overflow: hidden;
+}
+@media only screen and (min-width:100px) and (max-width: 400px) {
+  #google, #facebook, #twitter {
+      font-size: 0.6rem !important;
+  }
+}
+.s_logo {
+  display: block;
+  float: left;
+  font-size: 25px;
+  padding: 20px;
+  width: 60px;
+  background: rgba(0, 0, 0, 0.4);
+  margin-top: -20px;
+  margin-left: -15px;
+}
+#facebook{background:rgb(71, 71, 165)}
+#google{background:rgb(219, 46, 46)}
+#twitter{background:rgb(10, 190, 245)}
+.login_form p {
+  color: black;
+  margin-top: 10px;
+  font-size: 18px;
+  line-height: 20px;
+  font-family: sans-serif;
+}

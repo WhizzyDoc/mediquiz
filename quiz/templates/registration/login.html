@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %} 
+
+
+{% block title %}Login{% endblock title %}
+{% block active2 %}active{% endblock %}
+{% block active22 %}active{% endblock %}
+{% block style %}
+
+<style>
+.content{
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+  margin: auto;
+  margin-top: 50px;
+}
+.content h3 {
+    padding-top: 5px;
+  font-size: 27px;
+  font-weight: 600;
+  line-height: 33px;
+}
+
+.content form{
+  margin: 20px 27px;
+}
+.content form .field{
+  width: 100%;
+  height: 50px;
+  margin: 20px;
+  display: flex;
+  position: relative;
+}
+form .field input{
+  width: 100%;
+  height: 100%;
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+  padding-left: 15px;
+  font-size: 18px;
+  outline: none;
+}
+form .field .icons{
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.field .icons span{
+  height: 25px;
+  width: 25px;
+  border: 2px solid;
+  border-radius: 50%;
+  line-height: 25px;
+}
+.field .icons span.icon1{
+  color: #e74c3c;
+  border-color: #e74c3c;
+}
+.field .icons span.icon2{
+  color: #27ae60;
+  border-color: #27ae60;
+}
+form button{
+  margin: 20px;
+  width: 100%;
+  height: 45px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  background: #27ae60;
+  color: #f2f2f2;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+form button:hover{
+  background: #219150;
+}
+    .sign-txt {
+        text-align: center;
+        padding:5px;
+        color: #000;
+        font-size: 20px;
+    }
+    .sign-txt a {
+        color: red;
+        font-size: 20px;
+    }
+    
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="content">
+    <h3>Login Form</h3>
+    <form method="POST">
+       {% csrf_token %}
+       {% for field in form %}
+       {{ field.errors }}
+            <div class="field">
+                {{ field }}
+                <div class="icons"></div>
+            </div>
+        {% endfor %}
+       <button type="submit">Login</button>
+    </form>
+    <div class="sign-txt"><a href="{% url 'password_reset' %}">Forgot Password?</a></div>
+    <div class="sign-txt">A New Member? <a href="{% url 'register' %}">Sign Up</a></div>
+ </div>
+
+
+
+{% endblock %}
+{% block script %}
+<script>
+    $('input[type=text]').siblings('.icons').html(`<span class="icon2 fa fa-user"></span>`);
+    $('input[type=text]').attr('placeholder', 'Username');
+    $('input[type=password]').siblings('.icons').html(`<span class="icon2 fa fa-eye" id="pass"></span>`);
+    $('input[type=password]').attr('placeholder', 'Password');
+
+    $('input[type=password]').siblings('.icons').click(function() {
+        var typ = $(this).siblings('input').attr('type');
+        if(typ == 'password') {
+            $(this).siblings('input').attr('type', 'text');
+            $(this).html(`<span class="icon2 fa fa-eye-slash" id="pass"></span>`)
+        }
+        else {
+            $(this).siblings('input').attr('type', 'password');
+            $(this).html(`<span class="icon2 fa fa-eye" id="pass"></span>`)
+        }
+    })
+</script>
+{% endblock %}

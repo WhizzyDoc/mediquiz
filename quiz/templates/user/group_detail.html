@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load humanize %}
+
+
+{% block title %}{{ group.title }}{% endblock title %}
+{% block active6 %}active{% endblock %}
+{% block active66 %}active{% endblock %}
+{% block active666 %}active{% endblock %}
+{% block style %}
+<style>
+    /* Dashboard */
+    .dash-con {
+    padding: 20px;
+    background: #fff;
+    height: fit-content;
+    margin: 20px 0px;
+}
+.dash-head {
+    font-size: 25px;
+    font-weight: 700;
+}
+.count {
+    padding: 5px 8px;
+    background: #000;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 25px;
+}
+.dash-item {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: 10px;
+}
+.dash-item img {
+    padding: 5px;
+    border: 1px solid gray;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    margin-top: 10px;
+}
+.dash-item img#dp {
+    width: 150px;
+    height: 150px;
+}
+.dash-des {
+    padding-left: 20px;
+}
+.dash-des h3 {
+    font-weight: 500;
+    font-size: 20px;
+}
+button.btn {margin-bottom: 5px;}
+@media only screen and (max-width: 768px) {
+    .dash-item img {
+        width: 70px !important;
+        height: 70px !important;
+    }
+    .dash-des h3 {
+        font-size: 20px !important;
+    }
+}
+
+::selection{
+  background: rgba(23,162,184,0.3);
+}
+.wrapper{
+  padding: 30px 10px;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.wrapper .tabs{
+  position: relative;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+.wrapper .tabs label{
+  display: block;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  line-height: 50px;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  color: #17a2b8;
+  font-size: 20px;
+  font-weight: 500;
+  border-radius: 5px;
+  margin: 0 5px;
+  transition: all 0.3s ease;
+}
+.wrapper .tabs label:hover{
+  background: rgba(23,162,184,0.3);
+}
+#home:checked ~ .tabs label.home,
+#blog:checked ~ .tabs label.blog,
+#code:checked ~ .tabs label.code,
+#help:checked ~ .tabs label.help,
+  #about:checked ~ .tabs label.about{
+  color: #fff;
+}
+.tabs label i{
+  padding-right: 7px;
+}
+@media screen and (max-width:350px) {
+    .tabs label span {display:none;}
+}
+.tabs .slider{
+  position: absolute;
+  height: 100%;
+  width: 33.33333333%;
+  left: 0;
+  bottom: 0;
+  z-index: 0;
+  border-radius: 5px;
+  background: #17a2b8;
+  transition: all 0.3s ease;
+}
+input[type="radio"]{
+  display: none;
+}
+#blog:checked ~ .tabs .slider{
+  left: 33.33333333%;
+}
+#code:checked ~ .tabs .slider{
+  left: 66.6666666667%;
+}
+
+section .content{
+  display: none;
+  background: #fff;
+}
+#home:checked ~ section .content-1,
+#blog:checked ~ section .content-2,
+#code:checked ~ section .content-3{
+  display: block;
+}
+section .content .title{
+  font-size: 21px;
+  font-weight: 500;
+  margin: 30px 0 10px 0;
+}
+section .content p{
+text-align: justify;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Groups -->
+    <div class="dash-con row col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            <div class="dash-item col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <img src="{{ group.image.url }}" alt="" />
+                <div class="dash-des">
+                    <h3 style="font-size:20px;font-weight:600;">{{ group.title }}</h3>
+                    <span style="font-size:15px;">{{ group.description }}</span>
+                    <div style="color:gray;font-size:15px;">
+                        <i class="fa fa-globe"></i> {{ group.type }}
+                    </div>
+                    <div>
+                      <a href="#" class="join" data-id="{{ group.slug }}" data-action="{% if request.user in group.members.all %}leave{% else %}join{% endif %}">
+                        {% if request.user in group.members.all %}
+                            <button class="btn btn-danger join-btn">
+                                <i class="fa fa-exit"></i> Leave Group
+                            </button>
+                        {% else %}
+                        <button class="btn btn-success join-btn">
+                            <i class="fa fa-user-plus"></i> Join
+                        </button>
+                        {% endif %}
+                    </a>
+                    </div>
+                </div>
+            </div>
+
+             <!-- Activity Section -->
+             <div class="wrapper col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+              <input type="radio" name="slider" checked id="home">
+              <input type="radio" name="slider" id="blog">
+              <input type="radio" name="slider" id="code">
+              <div class="tabs">
+                  <label for="home" class="home"><i class="fa fa-group"></i><span>Members</span></label>
+                  <label for="blog" class="blog"><i class="fa fa-question"></i><span>Quizzes</span></label>
+                  <label for="code" class="code"><i class="fa fa-male"></i><span>Admins</span></label>
+                  <div class="slider"></div>
+              </div>
+                
+                <section>
+                <div class="content content-1">
+                  {% for m in members %}
+                  <div class="dash-item" style="width:100%">
+                    {% if m.photo %}
+                    <img src="{{ m.photo.url }}" alt="" />
+                    {% else %}
+                    <img src="{% static 'image/avatar.png' %}" alt="" />
+                    {% endif %}
+                      <div class="dash-des">
+                        <h3 style="font-weight:600;font-size:20px;">{{ m.user.username }}</h3>
+                        <div style="color:gray;font-size:15px;margin-top:0px;">
+                          <i class="fa fa-university"></i> {{ m.school }}&nbsp;&nbsp;&nbsp;
+                          <i class="fa fa-book"></i> {{ m.course }}
+                        </div>
+                        <div style="width:100%;margin-top:5px;">
+                          <a href="{{ m.get_user_profile }}"><button class="btn btn-primary"><i class="fa fa-eye"></i> Profile</button></a>
+                          <a href="#"><button class="btn btn-success"><i class="fa fa-comments"></i> Message</button></a>
+                        </div>
+                      </div>
+                  </div>
+                  {% empty %}
+                      <h4 style="color:gray">{{ group.title }} does not have any member yet</h4>
+                  {% endfor %}
+                </div>
+
+                <div class="content content-2">
+                  {% for q in group.quizzes.all %}
+                  <div class="dash-item col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                      <div class="dash-des">
+                          <h3 style="font-weight:600;font-size:20px;">{{ q.title }}</h3>
+                          <div style="color:gray;font-size:15px;">
+                              <i class="fa fa-clock-o"></i> {{ q.duration }} mins&nbsp;&nbsp;&nbsp;
+                              <i class="fa fa-question"></i> {{ q.questions.count }} question{{ q.questions.count|pluralize }}&nbsp;&nbsp;&nbsp;
+                              <i class="fa fa-group"></i> {{ q.score.count }} participant{{ q.score.count|pluralize }}
+                          </div>
+                          <div>
+                              <a href="{{ q.get_group_detail }}"><button class="btn btn-primary"><i class="fa fa-book"></i> Do Quiz</button></a>
+                              <button class="btn btn-info ranking" data-toggle="modal" data-target="#quizRankModal" data-id="{{ q.slug }}"><i class="fa fa-bar-chart"></i> Scores</button>
+                          </div>
+                      </div>
+                  </div>
+                      
+                  {% empty %}
+                  <h4 style="color:gray;margin:30px;">{{ group.title }} does not have any quiz.</h4>
+                  {% endfor %}
+                </div>
+
+                <div class="content content-3">
+                   {% for m in admins %}
+                  <div class="dash-item" style="width:100%">
+                    {% if m.photo %}
+                      <img src="{{ m.photo.url }}" alt="" />
+                      {% else %}
+                      <img src="{% static 'image/avatar.png' %}" alt="" />
+                      {% endif %}
+                      <div class="dash-des">
+                        <h3 style="font-weight:600;font-size:20px;">{{ m.user.username }}</h3>
+                        <div style="color:gray;font-size:15px;margin-top:0px;">
+                          <i class="fa fa-university"></i> {{ m.school }}&nbsp;&nbsp;&nbsp;
+                          <i class="fa fa-book"></i> {{ m.course }}
+                        </div>
+                        <div style="width:100%;margin-top:5px;">
+                          <a href="{{ m.get_user_profile }}"><button class="btn btn-primary"><i class="fa fa-eye"></i> Profile</button></a>
+                          <a href="#"><button class="btn btn-success"><i class="fa fa-comments"></i> Message</button></a>
+                        </div>
+                      </div>
+                  </div>
+                  {% empty %}
+                      <h4 style="color:gray">{{ group.title }} does not have any member yet</h4>
+                  {% endfor %}
+                </div>
+                
+                </section>
+            </div>
+        
+        
+    </div>
+    
+</div>
+
+
+{% endblock %}
+
+{% block script %}
+{% endblock %}

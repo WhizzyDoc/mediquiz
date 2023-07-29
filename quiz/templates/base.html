@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+{% load static %}
+{% load thumbnail %}
+{% load humanize %}
+<html lang="en" dir="ltr">
+    <head>
+        <title>MediQuiz - {% block title %}{% endblock title %}</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="">
+        <meta name="title" content="MediQuiz">
+        <meta name="author" content="">
+        <meta name="description" content="">
+        <meta name="keywords" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- For facebook sharing -->
+        <meta property="og:title" content="MediQuiz">
+        <meta property="og:description" content="">
+        <meta property="og:image:width" content="650">
+        <meta property="og:image:height" content="650">
+        <meta property="og:type" content="Quiz Website For Medical Students" />
+        <meta property="og:url" content="">
+        <!-- For twitter sharing -->
+        <meta name="twitter:card" content="">
+        <meta name="twitter:title" content="MediQuiz">
+        <meta name="twitter:description" content="">
+        <meta name="twitter:image" content="{% static 'image/mylogo.png' %}">
+        <meta name="twitter:site" content="@">
+        <meta name="twitter:creator" content="@DocWhizzy">
+        <!-- Favicon-->
+        <link rel="shortcut icon" href="{% static 'image/mylogo.png' %}" />
+        <link rel="shortcut" href="{% static 'image/mylogo.png' %}">
+        <link rel="apple-touch-icon" href="{% static 'image/mylogo.png' %}">
+        <!-- Stylesheets -->
+        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/fontawesome.css' %}">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <!--  Scripts -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <!-- script library used for customized alert box -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.8/dist/sweetalert2.all.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/jquery-3.6.1.min.js' %}"></script>
+        <script src="{% static 'js/velocity.min.js' %}"></script>
+        <script src="{% static 'js/js.cookie.min.js' %}"></script>
+        <script src="{% static 'js/emoji.js' %}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+        {% block style %}{% endblock %}
+        <style>
+            body {padding-bottom: 50px;}
+            header {
+    position: sticky;
+    top:0;
+    width: 100%;
+    max-width: 100%;
+    padding: 10px 20px;
+    z-index: 1000;
+    background: #000;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+header .title {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0 20px;
+}
+header .title img {
+    width: 30px;
+    height: 30px;
+}
+header .title h3 {
+    padding: 10px 0 0 15px;
+    font-weight: 700;
+}
+.icon {
+    padding:8px 15px;
+    border: 3px solid gray;
+    border-radius: 5px;
+    margin-right: 20px;
+}
+.icon i {
+    font-size: 25px;
+}
+.primnav {
+    display: block;
+    background: #000;
+    width: 100%;
+    padding: 0px 5px;
+    position: fixed;
+    left:0;
+    bottom:0;
+    z-index: 1000;
+}
+.primnav ul {
+    list-style-type: none;
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding: 0;
+}
+.primnav ul li {
+    padding: 0;
+    width: 16.666666%;
+    text-align: center;
+}
+.primnav ul li a {
+    color: #fff;
+    font-size: 15x;
+    padding: 10px 0px;
+    display: block;
+    width: 100%;
+    line-height: 8px;
+}
+.primnav ul li a.active, .primnav ul li a:hover {
+    color: #000 !important;
+    background: #fff;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+@media screen and (max-width:768px) {
+    .secnav {display:none}
+    .header{
+        position: static;
+    }
+    
+}
+@media screen and (min-width:769px) {
+    .icon {
+        display: none;
+    }
+    .nav ul {display: block}
+    nav {display:none}
+    .primnav {display:none}
+}
+#load-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 100000;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+    }
+    .load-container img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .load-container .spinner {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: none;
+        border-top: 5px solid #fff;
+        border-bottom: 5px solid #fff;
+        position: absolute;
+        left: calc(50% - 75px);
+        top: calc(50% - 75px);
+        animation: roll 1s linear infinite;
+        -webkit-animation: roll 1s linear infinite;
+        
+    }
+    .loader {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: none;
+        border-top: 5px solid #000000;
+        border-bottom: 5px solid #000000;
+        margin: auto;
+        animation: roll 1s linear infinite;
+        -webkit-animation: roll 1s linear infinite;
+    }
+    @keyframes roll {
+        from{transform:rotate(0deg)}
+        to{transform:rotate(360deg)}
+    }
+    @-webkit-keyframes roll {
+        from{-webkit-transform:rotate(0deg)}
+        to{-webkit-transform:rotate(360deg)}
+    }
+    .group-quiz-item {
+        display: flex;
+        width: 100%;
+        padding: 10px;
+        justify-content: space-between;
+        align-items: center;
+    }
+        </style>
+    </head>
+    <body>
+    
+        <!-- Loader -->
+        <div class="load-container" id="load-container">
+            <img src="{% static 'image/mylogo.png' %}" alt="" />
+            <div class="spinner"></div>
+        </div>
+
+        <!-- View Profile Form -->
+        <!-- The Modal -->
+        <div class="modal fade" id="viewProfileModal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                    <h4 class="modal-title" id="profileTitle">
+                         
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+            
+                    <!-- Modal body -->
+                    <div class="modal-body" id="profileBody">
+                        
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div> 
+
+        <!-- Add Quiz Form -->
+        <!-- The Modal -->
+        <div class="modal fade" id="addQuizModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <form class="modal-content needs-validation" action="#" method="POST" id="add-quiz-form">
+                    
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                    <h4 class="modal-title add-quiz-title">Create Quiz</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+            
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="quiz-title">Quiz Title:</label>
+                            <input type="text" class="form-control" id="quiz-title" placeholder="" name="quiz-title" required>
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                          </div>
+                          <div class="form-group">
+                            <label for="quiz-duration">Quiz Duration (mins):</label>
+                            <input type="number" min="1" max="120" class="form-control" id="quiz-duration" placeholder="" name="quiz-duration" required>
+                            <div class="valid-feedback"><i class="fa fa-check"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                          </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="quiz-add-submit">Submit</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+            
+                </form>
+            </div>
+        </div>
+
+        <!-- Add Group Quiz Form -->
+        <!-- The Modal -->
+        <div class="modal fade" id="addGroupQuizModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <form class="modal-content needs-validation" action="#" method="POST" id="add-group-quiz-form">
+                    
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                    <h4 class="modal-title add-group-quiz-title"></h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+            
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="g-quiz-title">Quiz Title:</label>
+                            <input type="text" class="form-control" id="g-quiz-title" placeholder="" name="quiz-title" required>
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                          </div>
+                          <div class="form-group">
+                            <label for="g-quiz-duration">Quiz Duration (mins):</label>
+                            <input type="number" min="1" max="120" class="form-control" id="g-quiz-duration" placeholder="" name="quiz-duration" required>
+                            <div class="valid-feedback"><i class="fa fa-check"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                          </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="group-quiz-add-submit">Submit</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+            
+                </form>
+            </div>
+        </div>
+
+        <!-- Add Question Form -->
+        <!-- The Modal -->
+        <div class="modal fade" id="addQuestionModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <form class="modal-content needs-validation" action="#" method="POST" id="add-question-form" enctype="multipart/form-data">
+                    
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                    <h4 class="modal-title add-question-title">Add Question</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+            
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="order">Question Number:</label>
+                            <input type="number" min="1" max="120" class="form-control" id="order" placeholder="" name="order" required>
+                            <div class="valid-feedback"><i class="fa fa-check"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="question">Question:</label>
+                            <input type="text" class="form-control" id="question" placeholder="" name="question" required>
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input question-image" id="question-image" name="question-image">
+                            <label class="custom-file-label" for="question-image">Question Image (If Any)</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="optiona">Option A:</label>
+                            <input type="text" class="form-control" id="optiona" placeholder="" name="optiona" required>
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="optiona">Option B:</label>
+                            <input type="text" class="form-control" id="optionb" placeholder="" name="optionb" required>
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="optiona">Option C:</label>
+                            <input type="text" class="form-control" id="optionc" placeholder="" name="optionc" required>
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="optiona">Option D:</label>
+                            <input type="text" class="form-control" id="optiond" placeholder="" name="optiond" required>
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="answer">Answer:</label>
+                            <select name="answer" id="answer" class="custom-select">
+                                <option selected>Select Answer</option>
+                                <option value="optionA">Option A</option>
+                                <option value="optionB">Option B</option>
+                                <option value="optionC">Option C</option>
+                                <option value="optionD">Option D</option>
+                            </select>
+                        </div>
+                          
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="question-add-submit">Submit</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+            
+                </form>
+            </div>
+        </div>
+
+        <!-- Add Quiz to Group Form -->
+        
+
+        <!-- Add Group Form -->
+        <!-- The Modal -->
+        <div class="modal fade" id="addGroupModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <form class="modal-content needs-validation" action="#" method="POST" id="add-group-form" enctype="multipart/form-data">
+                    
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                    <h4 class="modal-title">Create Group</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+            
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="group-title">Group Title:</label>
+                            <input type="text" class="form-control" id="group-title" placeholder="" name="group-title" required>
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="group-description">Group Description:</label>
+                            <input type="text" class="form-control" id="group-description" placeholder="" name="group-description" required>
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="group-type">Group Visibility:</label>
+                            <select name="group-type" id="group-type" class="custom-select">
+                                <option value="Public" selected>Public</option>
+                                <option value="Private">Private</option>
+                            </select>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input group-image" id="customFile" name="group-image">
+                            <label class="custom-file-label" for="customFile">Group Image</label>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="group-add-submit">Submit</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+            
+                </form>
+            </div>
+        </div>
+
+        <!-- Group Quiz -->
+        <!-- The Modal -->
+        <div class="modal fade" id="groupQuizModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="group-quiz-header">Group Quiz</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                
+                    <!-- Modal body -->
+                    <div class="modal-body" id="group-quiz-body">
+                        <div class="loader"></div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz rankng -->
+        <!-- The Modal -->
+        <div class="modal fade" id="quizRankModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="quiz-rank-header">Quiz Ranking</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                
+                    <!-- Modal body -->
+                    <div class="modal-body" id="quiz-rank-body">
+                        <div class="loader"></div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header section -->
+        <div class="row header">
+            <header class="col-12 col-sm-12 col-lg-12 col-md-12 col-xl-12">
+                <div class="title">
+                    <img src="{% static 'image/mylogo.png' %}" alt="" style="width:30px;height:30px;" />
+                    <h3 style="font-size:20px;">MEDIQUIZ</h3>
+                </div>
+                <div class="nav">
+                        <div class="icon">
+                            <i class="fa fa-navicon"></i>
+                        </div>
+                    <ul>
+                        {% if not request.user.is_authenticated %}
+                            <li><a href="{% url 'home' %}" class="{% block active1 %}{% endblock %}"><i class="fa fa-home"></i> Home</a></li>
+                            <li><a href="{% url 'login' %}" class="{% block active2 %}{% endblock %}"><i class="fa fa-key"></i> Login</a></li>
+                            <li><a href="{% url 'register' %}" class="{% block active3 %}{% endblock %}"><i class="fa fa-user-plus"></i> SignUp</a></li>
+                            
+                        {% endif %}
+                        <li><a href="{% url 'privacy' %}" class="{% block activea %}{% endblock %}"><i class="fa fa-lock"></i> Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </header>
+        </div>
+
+        <nav>
+            <ul>
+                {% if request.user.is_authenticated %}
+                <!--
+                    <li><a href="{% url 'dashboard' %}" class="{% block active0 %}{% endblock %}"><i class="fa fa-th"></i> Dashboard</a></li>
+                    <li><a href="{% url 'notifications' %}" class="{% block active4 %}{% endblock %}"><i class="fa fa-bell"></i> Notification</a></li>
+                    <li><a href="{% url 'quiz_list' %}" class="{% block active5 %}{% endblock %}"><i class="fa fa-question"></i> Quizzes</a></li>
+                    <li><a href="{% url 'group_list' %}" class="{% block active6 %}{% endblock %}"><i class="fa fa-group"></i> Groups</a></li>
+                    <li><a href="{% url 'people' %}" class="{% block active8 %}{% endblock %}"><i class="fa fa-male"></i><i class="fa fa-female"></i> People</a></li>
+                -->
+                    <li><a href="{% url 'logout' %}"><i class="fa fa-power-off"></i> Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'home' %}" class="{% block active11 %}{% endblock %}"><i class="fa fa-home"></i> Home</a></li>
+                    <li><a href="#" class="{% block active99 %}{% endblock %}"><i class="fa fa-building"></i> About</a></li>
+                    <li><a href="{% url 'login' %}" class="{% block active22 %}{% endblock %}"><i class="fa fa-key"></i> Login</a></li>
+                    <li><a href="{% url 'register' %}" class="{% block active33 %}{% endblock %}"><i class="fa fa-user-plus"></i> Sign Up</a></li>
+                {% endif %}
+                <li><a href="{% url 'privacy' %}" class="{% block activeaa %}{% endblock %}"><i class="fa fa-lock"></i> Privacy Policy</a></li>
+            </ul>
+        </nav>
+        {% if request.user.is_authenticated %}
+            <div class="secnav" style="top:0">
+                <ul>
+                    <li><a href="{% url 'dashboard' %}" class="{% block active00 %}{% endblock %}"><i class="fa fa-th"></i> Dashboard</a></li>
+                    <li><a href="{% url 'notifications' %}" class="{% block active44 %}{% endblock %}"><i class="fa fa-bell"></i> Activity</a></li>
+                    <li><a href="{% url 'quiz_list' %}" class="{% block active55 %}{% endblock %}"><i class="fa fa-book"></i> Quiz</a></li>
+                    <li><a href="{% url 'group_list' %}" class="{% block active66 %}{% endblock %}"><i class="fa fa-group"></i> Group</a></li>
+                    <li><a href="{% url 'people' %}" class="{% block active88 %}{% endblock %}"><i class="fa fa-male"></i><i class="fa fa-female"></i> Users</a></li>
+                    <li><a href="{% url 'user_profile' request.user.username %}" class="{% block active100 %}{% endblock %}"><i class="fa fa-user"></i> Me</a></li>
+                    <li><a href="{% url 'logout' %}" style="color:red;"><i class="fa fa-power-off"></i> Logout</a></li>
+                       
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if request.user.is_authenticated %}
+            <div class="primnav" style="bottom:0">
+                <ul>
+                    <li><a href="{% url 'dashboard' %}" title="Dashboard" class="{% block active000 %}{% endblock %}"><span class="fa fa-th"></span><br><span style="font-size:10px;">Menu</span></a></li>
+                    <li><a href="{% url 'notifications' %}" title="Notifications" class="{% block active444 %}{% endblock %}"><span class="fa fa-bell"></span><br><span style="font-size:10px;">News</span></a></li>
+                    <li><a href="{% url 'quiz_list' %}" title="All Quiz" class="{% block active555 %}{% endblock %}"><span class="fa fa-book"></span><br><span style="font-size:10px;">Quiz</span></a></li>
+                    <li><a href="{% url 'group_list' %}" title="All Groups" class="{% block active666 %}{% endblock %}"><span class="fa fa-group"></span><br><span style="font-size:10px;">Group</span></a></li>
+                    <li><a href="{% url 'people' %}" title="People" class="{% block active888 %}{% endblock %}"><span class="fa fa-male"></span><span class="fa fa-female"></span><br><span style="font-size:10px;">Users</span></a></li>
+                    <li><a href="{% url 'user_profile' request.user.username %}" title="Profile" class="{% block active101 %}{% endblock %}"><span class="fa fa-user"></span><br><span style="font-size:10px;">Me</span></a></li>
+                    <!--
+                    <li><a href="{% url 'logout' %}" style="color:yellow;"><span class="fa fa-power-off"></span></a></li>
+                    -->
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if messages %}
+        <ul class="messages" style="list-style-type:none;margin-top:10px;">
+            {% for message in messages %}
+           
+                <li class="alert alert-dismissible alert-{{ message.tags }}"><i class="fa fa-{{ message.tags }}"></i>
+                    {{ message|safe }} <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                </li>
+         
+                
+            {% endfor %}
+        </ul>
+      {% endif %}
+        {% block content %}{% endblock %}
+        
+        <script src="{% static 'js/script.js' %}"></script>
+        <script>
+            $(document).ready(function() { 
+                $('#load-container').hide();
+    // Navigation Bar
+    var opennav = document.querySelector('.icon')
+    var nav = document.querySelector('nav')
+    opennav.onclick = function() {
+        nav.classList.toggle('open');
+    }     
+    for(var e=0; e<face.length; e++) {
+        var content = `<span class="emoji">${face[e]}</span>`;
+        $('#face').append(content);
+    };
+    for(var e=0; e<dress.length; e++) {
+        var content = `<span class="emoji">${dress[e]}</span>`;
+        $('#dress').append(content);
+    };
+    for(var e=0; e<heart.length; e++) {
+        var content = `<span class="emoji">${heart[e]}</span>`;
+        $('#heart').append(content);
+    };
+    for(var e=0; e<hand.length; e++) {
+        var content = `<span class="emoji">${hand[e]}</span>`;
+        $('#hand').append(content);
+    };
+     for(var e=0; e<animal.length; e++) {
+        var content = `<span class="emoji">${animal[e]}</span>`;
+        $('#animal').append(content);
+    };
+    for(var e=0; e<food.length; e++) {
+        var content = `<span class="emoji">${food[e]}</span>`;
+        $('#food').append(content);
+    };
+    for(var e=0; e<place.length; e++) {
+        var content = `<span class="emoji">${place[e]}</span>`;
+        $('#place').append(content);
+    };
+                    
+    $('.emoji').click(function() {
+        $('#message').val($('#message').val() + $(this).html())
+    });
+
+    
+
+})
+/*
+    const disabledKeys = ['c', 'C', 'x', 'J', 'u', 'l'];
+    const showAlert = e => {
+        e.preventDefault();
+        return $(function(){
+                    Swal.fire("Sorry, you cannot copy or inspect this site.");
+                });
+    }
+    document.addEventListener("contextmenu", e => {
+        showAlert(e);
+    });
+    document.addEventListener("keydown", e => {
+        if((e.ctrlKey && disabledKeys.includes(e.key)) || e.key === 'F12') {
+          showAlert(e);
+        }
+    });
+*/ 
+        </script>
+        {% block script %}{% endblock %}
+    </body>
+</html>

@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load humanize %}
+
+
+{% block title %}{{ quiz.title }} Quiz{% endblock title %}
+{% block active5 %}active{% endblock %}
+{% block active55 %}active{% endblock %}
+{% block active555 %}active{% endblock %}
+{% block style %}
+<style>
+    /* Dashboard */
+    * {
+        box-sizing: border-box;
+    }
+    /* Dashboard */
+.dash-con {
+    padding: 20px;
+    background: #fff;
+    height: fit-content;
+    margin: 20px 0px;
+}
+.dash-head {
+    font-size: 25px;
+    font-weight: 700;
+}
+.count {
+    padding: 5px 8px;
+    background: #000;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 12px;
+}
+.dash-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+.dash-item img {
+    padding: 5px;
+    border: 1px solid gray;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    margin-top: 10px;
+}
+.dash-des {
+    padding-left: 20px;
+}
+.dash-des h3 {
+    font-weight: 600;
+    font-size: 25px;
+}
+button.btn {margin-bottom: 5px;}
+@media only screen and (max-width: 768px) {
+    .dash-item img {
+        width: 70px !important;
+        height: 70px !important;
+    }
+    .dash-des h3 {
+        font-size: 20px !important;
+    }
+}
+#exam-table {
+            visibility: hidden;
+        }
+        .time {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #000;
+            z-index: 100;
+        }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Groups -->
+    <div class="dash-con dash-quiz row col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+        <div class="dash-head col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            <div style="font-size:25px;">
+                {{ quiz.title }} Quiz
+            </div>
+            
+            <div style="color:gray;font-size:20px;">
+                <i class="fa fa-clock-o"></i> {{ quiz.duration }} mins&nbsp;&nbsp;&nbsp;
+                <i class="fa fa-question"></i> {{ quiz.questions.count }} question{{ quiz.questions.count|pluralize }}&nbsp;&nbsp;&nbsp;
+                <i class="fa fa-group"></i> {{ quiz.score.count }} participant{{ quiz.score.count|pluralize }}&nbsp;&nbsp;&nbsp;
+                <i class="fa fa-calendar"></i> {{ quiz.date }}
+            </div>
+            <div>
+                <button class="btn btn-primary" id="startBtn"><i class="fa fa-book"></i> Start Quiz</button>
+                <a href="#"><button class="btn btn-info"><i class="fa fa-bar-chart"></i> Scores</button></a>
+            </div>
+            <div class="time"><span style="font-weight:700;color:grey;">Time Left:</span> <span id="remaining-time"></span></div>
+        </div>
+        
+        <div class="dash-item col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            {% if score %}
+                <h1>Your score is {{ score }}</h1>
+            {% else %}
+                <div class="table-responsive" id="exam-table">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <form method="POST" action="{% url 'quiz_detail' quiz.slug %}" id="quiz-form" onsubmit="return saveAns()"  id="quiz-form">
+                                {% for q in questions %}
+                                    <tr>
+                                        <td style="width:50px">{{ q.order }}</td>
+                                        <td>
+                                            <h5><span>Question:</span>&nbsp;&nbsp;{{ q.question }}</h5>
+                                            <ol style="list-style-type:none">
+                                                <li><input type="radio" name="{{ q.order }}" id="{{ q.optionA }}" value="optionA" /> <label for="{{ q.optionA }}">A. {{ q.optionA }}</label></li>
+                                                <li><input type="radio" name="{{ q.order }}" id="{{ q.optionB }}" value="optionB" /> <label for="{{ q.optionB }}">B. {{ q.optionB }}</label></li>
+                                                <li><input type="radio" name="{{ q.order }}" id="{{ q.optionC }}" value="optionC" /> <label for="{{ q.optionC }}">C. {{ q.optionC }}</label></li>
+                                                <li><input type="radio" name="{{ q.order }}" id="{{ q.optionD }}" value="optionD" /> <label for="{{ q.optionD }}">D. {{ q.optionD }}</label></li>
+                                            </ol>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td></td>
+                                    <td><button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Submit Exam</button></td>
+                                </tr>
+                            </form>
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+            
+        
+        
+    </div>
+    
+</div>
+
+
+{% endblock %}
+
+
+
+{% block script %}
+<script>
+    function setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        var expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function saveAns() {
+        localStorage.removeItem('quizStartTime');
+        var ele = document.getElementsByTagName('input');
+        for (i = 0; i < ele.length; i++) {
+            if (ele[i].type = "radio") {
+                if (ele[i].checked) {
+                    setCookie(ele[i].name, ele[i].value, 3)
+                }
+            }
+        }
+
+    }
+
+    function formatDuration(duration) {
+        const mm = Math.floor(duration / 60);
+        const ss = duration % 60;
+        return `${mm.toString().padStart(2, '0')}:${ss.toString().padStart(2, '0')} minutes`;
+    }
+
+    function startTimer() {
+        const startTime = localStorage.getItem('quizStartTime');
+        const remainingTimeEl = "{{ remaining_time }}";
+        const duration = Number(remainingTimeEl);
+        let remainingTime;
+        if(startTime) {
+            const elapsedTime = Math.round((Date.now() - new Date(startTime)) / 1000);
+            remainingTime = duration - elapsedTime;
+            if(remainingTime <= 0) {
+                const examForm = document.getElementById('quiz-form');
+                examForm.onsubmit = function() {
+                    return saveAns();
+                };
+                examForm.submit();
+                return;
+            }
+        }
+        else {
+            localStorage.setItem('quizStartTime', new Date().toISOString());
+            remainingTime = duration;
+        }
+        const endTime = Date.now() + remainingTime * 1000;
+        const timer = setInterval(() => {
+            const remainingTime = Math.round((endTime - Date.now()) / 1000);
+            if(remainingTime <= 0) {
+                clearInterval(timer);
+                const examForm = document.getElementById('quiz-form');
+                examForm.onsubmit = function() {
+                    return saveAns();
+                };
+                examForm.submit();
+            }
+            else {
+                const formattedTime = formatDuration(remainingTime);
+                const time = document.getElementById('remaining-time');
+                time.innerHTML = formattedTime;
+                time.style.color = "white";
+                if(remainingTime < 60) {
+                    time.style.color = "yellow";
+                }
+            }
+        }, 1000)
+    }
+    const startBtn = document.getElementById('startBtn');
+    const examTable = document.getElementById('exam-table');
+    startBtn.onclick = function() {
+        examTable.style.visibility = "visible";
+        startTimer();
+        startBtn.style.display = "none";
+    }
+    
+</script>
+{% endblock %}

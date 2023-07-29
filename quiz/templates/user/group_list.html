@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load humanize %}
+
+
+{% block title %}Groups{% endblock title %}
+{% block active6 %}active{% endblock %}
+{% block active66 %}active{% endblock %}
+{% block active666 %}active{% endblock %}
+{% block style %}
+<style>
+    /* Dashboard */
+    * {
+        box-sizing: border-box;
+    }
+    /* Dashboard */
+.dash-con {
+    padding: 20px;
+    background: #fff;
+    height: fit-content;
+    margin: 20px 0px;
+}
+.dash-head {
+    font-size: 25px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.dash-head input {
+    padding: 10px;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    box-shadow: 0 9px 18px rgba(0, 0, 0, 0.3), 0px 7px 5px rgba(0, 0, 0, 0.22);
+    border-radius: 25px;
+    width: 180px;
+    font-weight: 400;
+    transition: width .3s ease-in-out;
+}
+
+.dash-head input:focus {
+    width: 280px;
+}
+.dash-head input::placeholder {
+    color: gray;
+}
+.count {
+    padding: 5px 8px;
+    background: #000;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 12px;
+}
+.dash-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 20px;
+}
+.dash-item img {
+    padding: 5px;
+    border: 1px solid gray;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    margin-top: 10px;
+}
+.dash-des {
+    padding-left: 20px;
+}
+.dash-des h3 {
+    font-weight: 600;
+    font-size: 25px;
+}
+@media only screen and (max-width: 768px) {
+    .dash-item img {
+        width: 70px !important;
+        height: 70px !important;
+    }
+    .dash-des h3 {
+        font-size: 20px !important;
+    }
+}
+button.btn {margin-bottom: 5px;}
+.search-group-form {
+    position: relative;
+    display: inline-block;
+}
+.search-options {
+    position: absolute;
+    margin-top: 5px;
+    z-index: 50;
+    background: #fff;
+    display: none;
+    width: 100%;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.3), 0 14px 11px rgba(0, 0, 0, 0.22); 
+}
+.search-options a {
+    display: block;
+    padding: 15px;
+    text-decoration: none;
+    color: #000;
+    font-size: 15px;
+}
+.search-options a:hover {
+    color: #fff;
+    background: #000;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Groups -->
+    <div class="dash-con dash-group row col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+        <div class="dash-head col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            <div>
+                All Groups <sup><span class="count">{{ groups.count }}</span></sup>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addGroupModal" style="margin-top:15px;">
+                    <i class="fa fa-plus"></i> Add
+                </button>
+            </div>
+            <form class="search-group-form" method="GET" action="#">
+                <input type="text" id="search-group" name="search-group" placeholder="Search Title, Description" required />
+                <div class="search-options">
+                    
+                </div>
+                
+            </form>
+        </div>
+        {% for g in groups %}
+            <div class="dash-item col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                <img src="{% thumbnail g.image 200x200 %}" alt="" />
+                <div class="dash-des">
+                    <h3>{{ g.title }}</h3>
+                    <span style="font-size:15px;">{{ g.description }}</span>
+                    <div style="color:gray;font-size:15px;">
+                        <i class="fa fa-globe"></i> {{ g.type }}&nbsp;&nbsp;&nbsp;
+                        <i class="fa fa-group"></i> <span class="mem-count">{{ g.members.count|intcomma }}</span> member{{ g.members.count|pluralize }}&nbsp;&nbsp;&nbsp;
+                        <i class="fa fa-book"></i> {{ g.quizzes.count|intcomma }} quiz&nbsp;&nbsp;&nbsp;
+                        {% if request.user in g.members.all %}
+                            <i class="fa fa-user"></i> {% if request.user in g.admins.all %}Admin{% else %}Member{% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div style="width:100%;margin-top:5px;">
+                    <a href="{{ g.get_group_detail }}" title="View Group"><button class="btn btn-info"><i class="fa fa-eye"></i></button></a>
+                    <a href="#" title="Group Quiz" class="group-quiz" data-id="{{ g.slug }}" data-toggle="modal" data-target="#groupQuizModal">
+                        <button class="btn btn-primary"><i class="fa fa-book"></i> <i class="fa fa-question"></i></button>
+                    </a>
+                    <a href="#" class="join" data-id="{{ g.slug }}" data-action="{% if request.user in g.members.all %}leave{% else %}join{% endif %}">
+                        {% if request.user in g.members.all %}
+                            <button class="btn btn-danger join-btn" title="Leave group">
+                                <i class="fa fa-user-times"></i>
+                            </button>
+                        {% else %}
+                        <button class="btn btn-success join-btn" title="Join group">
+                            <i class="fa fa-user-plus"></i>
+                        </button>
+                        {% endif %}
+                    </a>
+                    
+                </div>
+            </div>
+        {% empty %}
+        <h4 style="color:gray;">You don't have any group.</h4>
+        {% endfor %}
+        
+    </div>
+    
+</div>
+
+
+{% endblock %}
+
+
+{% block script %}
+<script>
+    $(document).on('input', '#search-group', function(e) {
+    var searchItem = $('#search-group').val();
+    if(searchItem != '') {
+        $('.search-options').show();
+    }
+    else {
+        $('.search-options').hide();
+    }
+    var loader = `<div class="loader"></div>`;
+    $('.search-options').html(loader);
+    
+    const search_user_url = "/activities/search/" + searchItem + "/";
+    fetch(search_user_url, {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest', // necessary to work with .is_ajax verification
+        },
+    })
+    .then(response => {
+        return response.json() // convert response to json
+    })
+    .then(data => {
+        groups = data.groups
+        $('.search-options').empty();
+        for (var key in groups) {
+            var list = `<a href="/groups/${groups[key].slug}/" class="search-result">
+                            ${groups[key].title}<br><span style="color:gray;font-size:10px;">${groups[key].description}</span>
+                        </a>`;
+            $('.search-options').append(list);
+        }
+        
+    })
+    
+})
+</script>
+
+{% endblock %}

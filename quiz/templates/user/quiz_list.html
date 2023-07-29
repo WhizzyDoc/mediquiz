@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load humanize %}
+
+
+{% block title %}Quizzes{% endblock title %}
+{% block active5 %}active{% endblock %}
+{% block active55 %}active{% endblock %}
+{% block active555 %}active{% endblock %}
+{% block style %}
+<style>
+    /* Dashboard */
+    * {
+        box-sizing: border-box;
+    }
+    /* Dashboard */
+.dash-con {
+    padding: 20px;
+    background: #fff;
+    height: fit-content;
+    margin: 20px 0px;
+}
+.dash-head {
+    font-size: 25px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.dash-head input {
+    padding: 10px;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    box-shadow: 0 9px 18px rgba(0, 0, 0, 0.3), 0px 7px 5px rgba(0, 0, 0, 0.22);
+    border-radius: 25px;
+    width: 180px;
+    font-weight: 400;
+    transition: width .3s ease-in-out;
+}
+
+.dash-head input:focus {
+    width: 280px;
+}
+.dash-head input::placeholder {
+    color: gray;
+}
+.count {
+    padding: 5px 8px;
+    background: #000;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 12px;
+}
+.dash-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+.dash-item img {
+    padding: 5px;
+    border: 1px solid gray;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    margin-top: 10px;
+}
+.dash-des {
+    padding-left: 20px;
+}
+.dash-des h3 {
+    font-weight: 600;
+    font-size: 25px;
+}
+button.btn {margin-bottom: 5px;}
+@media only screen and (max-width: 768px) {
+    .dash-item img {
+        width: 70px !important;
+        height: 70px !important;
+    }
+    .dash-des h3 {
+        font-size: 20px !important;
+    }
+}
+.search-quiz-form {
+    position: relative;
+    display: inline-block;
+}
+.search-options {
+    position: absolute;
+    margin-top: 5px;
+    z-index: 50;
+    background: #fff;
+    display: none;
+    width: 100%;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.3), 0 14px 11px rgba(0, 0, 0, 0.22); 
+}
+.search-options a {
+    display: block;
+    padding: 15px;
+    text-decoration: none;
+    color: #000;
+    font-size: 15px;
+}
+.search-options a:hover {
+    color: #fff;
+    background: #000;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Groups -->
+    <div class="dash-con dash-quiz row col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+        <div class="dash-head col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            <div>
+                All Quizzes <sup><span class="count">{{ quiz.count }}</span></sup>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addQuizModal" style="margin-top:15px;">
+                    <i class="fa fa-plus"></i> Add
+                </button>
+            </div>
+            <form class="search-quiz-form" method="GET" action="#">
+                <input type="text" id="search-quiz" name="search-quiz" placeholder="Search By Title" required />
+                <div class="search-options">
+                    
+                </div>
+                
+            </form>
+        </div>
+        {% for q in quiz %}
+        <div class="dash-item col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+            <div class="dash-des">
+                <h3>{{ q.title }}</h3>
+                <div style="color:gray;font-size:15px;">
+                    <i class="fa fa-clock-o"></i> {{ q.duration }} mins&nbsp;&nbsp;&nbsp;
+                    <i class="fa fa-question"></i> {{ q.questions.count }} question{{ q.questions.count|pluralize }}&nbsp;&nbsp;&nbsp;
+                    <i class="fa fa-group"></i> {{ q.score.count }} participant{{ q.score.count|pluralize }}
+                    
+                </div>
+                <div>
+                    <a href="{{ q.get_group_detail }}"><button class="btn btn-primary"><i class="fa fa-book"></i> Do Quiz</button></a>
+                    <button class="btn btn-info ranking" data-toggle="modal" data-target="#quizRankModal" data-id="{{ q.slug }}"><i class="fa fa-bar-chart"></i> Scores</button>
+                </div>
+            </div>
+        </div>
+            
+        {% empty %}
+        <h4 style="color:gray;">There are no quiz yet.</h4>
+        {% endfor %}
+        
+    </div>
+    
+</div>
+
+
+{% endblock %}
+
+
+
+{% block script %}
+<script>
+    $(document).on('input', '#search-quiz', function(e) {
+    var searchItem = $('#search-quiz').val();
+    if(searchItem != '') {
+        $('.search-options').show();
+    }
+    else {
+        $('.search-options').hide();
+    }
+    var loader = `<div class="loader"></div>`;
+    $('.search-options').html(loader);
+    
+    const search_user_url = "/activities/search/" + searchItem + "/";
+    fetch(search_user_url, {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest', // necessary to work with .is_ajax verification
+        },
+    })
+    .then(response => {
+        return response.json() // convert response to json
+    })
+    .then(data => {
+        quiz = data.quiz
+        $('.search-options').empty();
+        for (var key in quiz) {
+            var list = `<a href="/quizzes/${quiz[key].slug}/" class="search-result">
+                            ${quiz[key].title}<br><span style="color:gray;font-size:10px;">${quiz[key].duration} mins</span>
+                        </a>`;
+            $('.search-options').append(list);
+        }
+        
+    })
+    
+})
+</script>
+{% endblock %}

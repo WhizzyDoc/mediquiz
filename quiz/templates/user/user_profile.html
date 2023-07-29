@@ -1,0 +1,452 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load humanize %}
+
+
+{% block title %}{{ profile.user.username }}{% endblock title %}
+{% block active8 %}active{% endblock %}
+{% block active100 %}active{% endblock %}
+{% block active101 %}active{% endblock %}
+{% block style %}
+<style>
+    /* Dashboard */
+.dash-con {
+    padding: 20px;
+    background: #fff;
+    height: fit-content;
+    margin: 20px 0px;
+}
+.dash-head {
+    font-size: 25px;
+    font-weight: 700;
+}
+.count {
+    padding: 5px 8px;
+    background: #000;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 25px;
+}
+.dash-item {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: 10px;
+}
+.dash-item img {
+    padding: 5px;
+    border: 1px solid gray;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    margin-top: 10px;
+}
+.dash-item img#dp {
+    width: 150px;
+    height: 150px;
+}
+.dash-des {
+    padding-left: 20px;
+}
+.dash-des h3 {
+    font-weight: 500;
+    font-size: 20px;
+}
+button.btn {margin-bottom: 5px;}
+@media only screen and (max-width: 768px) {
+    .dash-item img {
+        width: 70px !important;
+        height: 70px !important;
+    }
+    .dash-des h3 {
+        font-size: 20px !important;
+    }
+}
+
+::selection{
+  background: rgba(23,162,184,0.3);
+}
+.wrapper{
+  padding: 30px 10px;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.wrapper .tabs{
+  position: relative;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+.wrapper .tabs label{
+  display: block;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  line-height: 50px;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  color: #17a2b8;
+  font-size: 20px;
+  font-weight: 500;
+  border-radius: 5px;
+  margin: 0 5px;
+  transition: all 0.3s ease;
+}
+.wrapper .tabs label:hover{
+  background: rgba(23,162,184,0.3);
+}
+#home:checked ~ .tabs label.home,
+#blog:checked ~ .tabs label.blog,
+#code:checked ~ .tabs label.code,
+#help:checked ~ .tabs label.help,
+  #about:checked ~ .tabs label.about{
+  color: #fff;
+}
+.tabs label i{
+  padding-right: 7px;
+}
+@media screen and (max-width:350px) {
+    .tabs label span {display:none;}
+}
+.tabs .slider{
+  position: absolute;
+  height: 100%;
+  width: 33.33333333%;
+  left: 0;
+  bottom: 0;
+  z-index: 0;
+  border-radius: 5px;
+  background: #17a2b8;
+  transition: all 0.3s ease;
+}
+input[type="radio"]{
+  display: none;
+}
+#blog:checked ~ .tabs .slider{
+  left: 33.33333333%;
+}
+#code:checked ~ .tabs .slider{
+  left: 66.6666666667%;
+}
+
+section .content{
+  display: none;
+  background: #fff;
+}
+#home:checked ~ section .content-1,
+#blog:checked ~ section .content-2,
+#code:checked ~ section .content-3,
+#help:checked ~ section .content-4,
+#about:checked ~ section .content-5{
+  display: block;
+}
+section .content .title{
+  font-size: 21px;
+  font-weight: 500;
+  margin: 30px 0 10px 0;
+}
+section .content p{
+text-align: justify;
+}
+#profile-id {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    padding: 5px;
+    border: 1px olid gray;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Groups -->
+    <div class="dash-con row col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+        <!-- Profile Section -->
+        <div class="dash-head col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            My Profile
+        </div>
+            <div class="dash-item col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                {% if profile.photo %}
+                <a href="{{ profile.photo.url }}">
+                    <img id="dp" src="{{ profile.photo.url }}" alt="" />
+                </a>
+                {% else %}
+                <img id="dp" src="{% static 'image/avatar.png' %}" alt="" />
+                {% endif %}
+                <div class="dash-des" id="des">
+                    <h3 style="font-size:25px;font-weight:600">{{ profile.user.username }}</h3>
+                    <h3 style="font-size:25px">{{ profile.l_name }} {{ profile.f_name }}</h3>
+                    <span style="font-size:15px;">{{ profile.about }}</span>
+                    <div style="color:gray;font-size:15px;">
+                        <i class="fa fa-university"></i> {{ profile.school }}&nbsp;&nbsp;&nbsp;
+                        <i class="fa fa-book"></i> {{ profile.course }}
+                    </div>
+                    <div>
+                        {% if profile.user == request.user %}
+                        <button type="button" class="btn btn-success edit-profile-btn" data-toggle="modal" data-target="#editProfileModal">
+                            <i class="fa fa-edit"></i> Edit
+                        </button>
+                        {% else %}
+                        <a href="#"><button class="btn btn-success"><i class="fa fa-comments"></i> Message</button></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        <!-- Activity Section -->
+            <div class="wrapper col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <input type="radio" name="slider" checked id="home">
+                <input type="radio" name="slider" id="blog">
+                <input type="radio" name="slider" id="code">
+                <div class="tabs">
+                    <label for="home" class="home"><i class="fa fa-group"></i><span>Groups</span></label>
+                    <label for="blog" class="blog"><i class="fa fa-question"></i><span>Quizzes</span></label>
+                    <label for="code" class="code"><i class="fa fa-bar-chart"></i><span>Scores</span></label>
+                    <div class="slider"></div>
+                </div>
+                <section>
+
+
+                <div class="content content-1">
+                    {% for g in groups %}
+                    <div class="dash-item" style="width:100%">
+                        <img src="{% thumbnail g.image 200x200 %}" alt="" />
+                        <div class="dash-des">
+                            <h3 style="font-weight:600;font-size:20px;">{{ g.title }}</h3>
+                            <span style="font-size:15px;">{{ g.description }}</span>
+                            <div style="color:gray;font-size:15px;">
+                                <i class="fa fa-globe"></i> {{ g.type }}&nbsp;&nbsp;&nbsp;
+                                <i class="fa fa-group"></i> {{ g.members.count|intcomma }} member{{ g.members.count|pluralize }}&nbsp;&nbsp;&nbsp;
+                                <i class="fa fa-book"></i> {{ g.quizzes.count|intcomma }} quiz&nbsp;&nbsp;&nbsp;
+                                <i class="fa fa-user"></i> {% if profile.user in g.admins.all %}Admin{% else %}Member{% endif %}
+                            </div>
+                            
+                        </div>
+                        <div style="width:100%;margin-top:5px;">
+                            <a href="{{ g.get_group_detail }}" title="View Group"><button class="btn btn-info"><i class="fa fa-eye"></i></button></a>
+                            <a href="#" title="Group Quiz" class="group-quiz" data-id="{{ g.slug }}" data-toggle="modal" data-target="#groupQuizModal">
+                                <button class="btn btn-primary"><i class="fa fa-book"></i> <i class="fa fa-question"></i></button>
+                            </a>
+                            <a href="#" class="join" data-id="{{ g.slug }}" data-action="{% if request.user in g.members.all %}leave{% else %}join{% endif %}">
+                                {% if request.user in g.members.all %}
+                                    <button class="btn btn-danger join-btn" title="Leave Group">
+                                        <i class="fa fa-user-times"></i>
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-success join-btn" title="Join Group">
+                                        <i class="fa fa-user-plus"></i>
+                                    </button>
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                        <h4 style="color:gray">You do not belong to any group yet</h4>
+                    {% endfor %}
+                </div>
+
+
+                <div class="content content-2">
+                    {% for q in quiz %}
+                    <div class="dash-item" style="width:100%">
+                        <div class="dash-des">
+                            <h3 style="font-weight:600;font-size:20px;">{{ q.title }}</h3>
+                            <div style="color:gray;font-size:15px;">
+                                <i class="fa fa-clock-o"></i> {{ q.duration }} mins&nbsp;&nbsp;&nbsp;
+                                <i class="fa fa-question"></i> {{ q.questions.count }} question{{ q.questions.count|pluralize }}&nbsp;&nbsp;&nbsp;
+                                <i class="fa fa-group"></i> {{ q.score.count }} participant{{ q.score.count|pluralize }}
+                            </div>
+                            <div>
+                                <a href="{{ q.get_group_detail }}"><button class="btn btn-primary"><i class="fa fa-book"></i> Do Quiz</button></a>
+                                <button class="btn btn-info ranking" data-toggle="modal" data-target="#quizRankModal" data-id="{{ q.slug }}"><i class="fa fa-bar-chart"></i> Scores</button>
+                            </div>
+                        </div>
+                    </div>
+                        
+                    {% empty %}
+                    <h4 style="color:gray;margin:30px;">You have not created any quiz.</h4>
+                    {% endfor %}
+                </div>
+
+
+                <div class="content content-3">
+                    {% for s in profile.scores.all %}
+                    <div class="dash-item"  style="width:100%">
+                        <div class="dash-des">
+                            <h3 style="font-weight:600;font-size:20px;">{{ s.quiz.title }}</h3>
+                            <div style="color:gray;font-size:15px;">
+                                <i class="fa fa-bar-chart" style="color:rgb(82, 82, 250);"></i> <span>Score:</span> {{ s.score }}%&nbsp;&nbsp;&nbsp;
+                                <i class="fa fa-star" style="color:rgb(253, 167, 6);"></i> <span>Medal:</span> {{ s.remark }}
+                            </div>
+                        </div>
+                    </div>
+                        
+                    {% empty %}
+                    <h4 style="color:gray;margin:30px;">You have not done any quiz yet.</h4>
+                    {% endfor %}
+                </div>
+                </section>
+            </div>
+        
+    </div>
+    
+</div>
+
+<!-- Edit Profile Form -->
+        <!-- The Modal -->
+        <div class="modal fade" id="editProfileModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <form class="modal-content needs-validation" action="#" method="POST" id="edit-profile-form" enctype="multipart/form-data">
+                    
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                    <h4 class="modal-title">
+                        <img src="{% if profile.photo %}{{ profile.photo.url }}{% else %}{% static 'image/avatar.png' %}{% endif %}" alt="" id="profile-id" /> 
+                        My Profile
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+            
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="username">Username:</label>
+                            <input type="text" class="form-control" id="username" placeholder="" name="username" value="{{ request.user.username }}" readonly>
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="first-name">First Name:</label>
+                            <input type="text" class="form-control" id="first-name" placeholder="" name="first-name">
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="last-name">Last Name:</label>
+                            <input type="text" class="form-control" id="last-name" placeholder="" name="last-name">
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="about">About You:</label>
+                            <input type="text" class="form-control" id="about" placeholder="" name="about">
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="school">School:</label>
+                            <input type="text" class="form-control" id="school" placeholder="" name="school">
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="course">Course Studying:</label>
+                            <input type="text" class="form-control" id="course" placeholder="" name="course">
+                            <div class="valid-feedback"><i class="fa fa-check-circle"></i> Valid.</div>
+                            <div class="invalid-feedback">Please fill out this field.</div>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input group-image" id="profile-image" name="profile-image">
+                            <label class="custom-file-label" for="profile-image">Profile Image</label>
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="profile-edit-submit">Submit</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+            
+                </form>
+            </div>
+        </div>
+
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $('.edit-profile-btn').click(function() {
+        var fname = '{{ profile.f_name }}';
+        var lname = '{{ profile.l_name }}';
+        var about = '{{ profile.about }}';
+        var school = '{{ profile.school }}';
+        var course = '{{ profile.course }}';
+
+        $('#first-name').val(fname);
+        $('#last-name').val(lname);
+        $('#about').val(about);
+        $('#school').val(school);
+        $('#course').val(course);
+    });
+
+    
+    $('#edit-profile-form').submit(function(e) {
+        e.preventDefault();
+        var edit_profile_url = "/activities/edit-profile/";
+        const formData = new FormData();
+        formData.append('first-name', $('#first-name').val());
+        formData.append('last-name', $('#last-name').val());
+        formData.append('about', $('#about').val());
+        formData.append('school', $('#school').val());
+        formData.append('course', $('#course').val());
+        formData.append('profile-image', $('#profile-image')[0].files[0]);
+        $('#profile-edit-submit').text('Submitting');
+
+        fetch(edit_profile_url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest', // necessary to work with .is_ajax verification
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: formData,
+        })
+        .then(response => {
+            return response.json() // convert response to json
+        })
+        .then(data => {
+                // perform action with response data
+                var p = data.profile;
+                $('#profile-edit-submit').text('Submit');
+                $(function() {
+                    Swal.fire('Profile Updated Successfully!');
+                });
+                var temp = `{% if profile.photo %}
+                                <a href="{{ profile.photo.url }}">
+                                    <img id="dp" src="{{ profile.photo.url }}" alt="" />
+                                </a>
+                            {% else %}
+                                <img id="dp" src="/static/image/avatar.png" alt="" />
+                            {% endif %}
+                            <div class="dash-des" id="des">
+                                <h3 style="font-size:25px;font-weight:600">{{ profile.user.username }}</h3>
+                                <h3 style="font-size:25px">${p.lname} ${p.fname}</h3>
+                                <span style="font-size:15px;">${p.about}</span>
+                                <div style="color:gray;font-size:15px;">
+                                    <i class="fa fa-university"></i> ${p.school}&nbsp;&nbsp;&nbsp;
+                                    <i class="fa fa-book"></i> ${p.course}
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-success edit-profile-btn" data-toggle="modal" data-target="#editProfileModal">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </button>
+                                </div>
+                            </div>`;
+                $('.dash-item').html(temp);
+            })
+            .catch(error => {
+                $(function() {
+                    Swal.fire('Error Occured!');
+                })
+            })
+    })
+    
+</script>
+{% endblock %}
